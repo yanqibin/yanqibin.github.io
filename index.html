@@ -388,6 +388,54 @@
 </ul>
 <h3 id="业务流程图"><a href="#业务流程图" class="headerlink" title="业务流程图"></a>业务流程图</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">sequenceDiagram</div><div class="line">user-&gt;&gt;web:更新数据</div><div class="line">web-&gt;&gt;DB: 更新数据至数据库</div><div class="line">web-&gt;&gt;DB: 插入待更新solr数据</div><div class="line">timer-&gt;&gt;DB:获取要更新的数据</div><div class="line">DB-&gt;&gt;timer:返会更新数据</div><div class="line">timer-&gt;&gt;solr:推送更新数据至solr</div><div class="line">user-&gt;&gt;web:查询数据</div><div class="line">web-&gt;&gt;solr:获取数据</div><div class="line">solr-&gt;&gt;web:返回数据主键</div><div class="line">web-&gt;&gt;DB:通过主键获取数据</div><div class="line">web-&gt;&gt;user:展示数据</div></pre></td></tr></table></figure>
 <p><img src="/uploads/images/solr.png" alt="image"></p>
+<h3 id="solr-功能"><a href="#solr-功能" class="headerlink" title="solr 功能"></a>solr 功能</h3><ul>
+<li>分词搜索<blockquote>
+<p>例如: 将 搜索词 <code>花王纸尿裤</code>  拆分为 <code>花王</code> 和 <code>纸尿裤</code> 进行搜索</p>
+</blockquote>
+</li>
+</ul>
+<blockquote>
+<p>缺点:依赖分词器,分词结果可能与预想结果不同</p>
+</blockquote>
+<ul>
+<li><p>模糊查询</p>
+<blockquote>
+<p>通过相似度进行搜索，查询达到某个相似度的数据</p>
+</blockquote>
+</li>
+<li><p>权重</p>
+<blockquote>
+<p>为不同字段设置权重  ，对不同字段设置不同权重,通过权重计算得出排序</p>
+</blockquote>
+</li>
+</ul>
+<ul>
+<li><p>查询范围</p>
+<blockquote>
+<p> 例如:查询价格区间</p>
+</blockquote>
+</li>
+<li><p>高亮显示</p>
+<blockquote>
+<p>将匹配到关键词高亮显示</p>
+</blockquote>
+</li>
+<li><p>分组统计(Facet)</p>
+<blockquote>
+<p>产品匹配到的数据有几个在类目1，几个在类目2  几个在某个属性组中</p>
+</blockquote>
+</li>
+<li><p>相似匹配</p>
+<blockquote>
+<p>匹配与当前商品相似的商品</p>
+</blockquote>
+</li>
+<li><p>拼音检索</p>
+<blockquote>
+<p>通过拼音查询中文数据</p>
+</blockquote>
+</li>
+</ul>
 
           
         
