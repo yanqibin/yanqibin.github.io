@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="左右脑源码解读 最近看看你的左右脑年龄可以说是非常火，朋友圈有不少朋友人在玩，也看到有大牛对代码进行了解决，对此我也颇感兴趣来解读一番。地址 ：[http://game.if122.com]  数据分析 查看其源码 与网络请求，发现其发起了两次请求 js/index.json 与js/index_2.json。   首先 是js/index.json ,返回结果为问题题目，共9个节点，第一个如下所">
+<meta property="og:type" content="article">
+<meta property="og:title" content="判断左右脑源码解读">
+<meta property="og:url" content="https://yanqibin.github.io/2017/10/26/判断左右脑源码解读/index.html">
+<meta property="og:site_name" content="yanqibin 个人博客">
+<meta property="og:description" content="左右脑源码解读 最近看看你的左右脑年龄可以说是非常火，朋友圈有不少朋友人在玩，也看到有大牛对代码进行了解决，对此我也颇感兴趣来解读一番。地址 ：[http://game.if122.com]  数据分析 查看其源码 与网络请求，发现其发起了两次请求 js/index.json 与js/index_2.json。   首先 是js/index.json ,返回结果为问题题目，共9个节点，第一个如下所">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2025-07-17T01:25:17.779Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="判断左右脑源码解读">
+<meta name="twitter:description" content="左右脑源码解读 最近看看你的左右脑年龄可以说是非常火，朋友圈有不少朋友人在玩，也看到有大牛对代码进行了解决，对此我也颇感兴趣来解读一番。地址 ：[http://game.if122.com]  数据分析 查看其源码 与网络请求，发现其发起了两次请求 js/index.json 与js/index_2.json。   首先 是js/index.json ,返回结果为问题题目，共9个节点，第一个如下所">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yanqibin.github.io/2017/10/26/判断左右脑源码解读/">
+
+
+
+
+
+  <title>判断左右脑源码解读 | yanqibin 个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">yanqibin 个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">yanqibin</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yanqibin.github.io/2017/10/26/判断左右脑源码解读/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="yanqibin">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/uploads/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="yanqibin 个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">判断左右脑源码解读</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-26T08:37:10+08:00">
+                2017-10-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="左右脑源码解读"><a href="#左右脑源码解读" class="headerlink" title="左右脑源码解读"></a>左右脑源码解读</h2><blockquote>
+<p>最近看看你的左右脑年龄可以说是非常火，朋友圈有不少朋友人在玩，也看到有大牛对代码进行了解决，对此我也颇感兴趣来解读一番。<br>地址 ：[<a href="http://game.if122.com" target="_blank" rel="noopener">http://game.if122.com</a>]</p>
+</blockquote>
+<h2 id="数据分析"><a href="#数据分析" class="headerlink" title="数据分析"></a>数据分析</h2><blockquote>
+<p>查看其源码 与网络请求，发现其发起了两次请求 <code>js/index.json</code> 与<code>js/index_2.json</code>。</p>
+</blockquote>
+<ul>
+<li><p>首先 是<code>js/index.json</code> ,返回结果为问题题目，共9个节点，第一个如下所示:</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"question"</span>:<span class="string">"这个男人的眼睛是在一条直线上吗？"</span>,</span><br><span class="line">  <span class="attr">"answer"</span>:&#123;</span><br><span class="line">    <span class="attr">"是"</span>:<span class="string">"2"</span>,</span><br><span class="line">    <span class="attr">"否"</span>:<span class="string">"2"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">"banner"</span>:<span class="string">"images/1_pWzVxxQ.jpg"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>js/index_2.json</code> 中返回年龄与应该展示共个4个节点 每个节点中的word分别为a,b,c,d，第一个节点如下所示：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">&#123;<span class="attr">"word"</span>:<span class="string">"a"</span>,</span><br><span class="line">  <span class="attr">"name"</span>:&#123;</span><br><span class="line">    <span class="attr">"one"</span>:<span class="string">"25与27岁"</span>,</span><br><span class="line">    <span class="attr">"two"</span>:<span class="string">"39与22岁"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">"output"</span>:</span><br><span class="line">  &#123;<span class="attr">"img"</span>:<span class="string">"images/86DA2WyG5I5uXM1.jpg"</span>,</span><br><span class="line">    <span class="attr">"text"</span>:<span class="string">"李白属于灵活走位，多段位移，七进七出，秀你一脸，比较吃操作的英雄，因此玩家的意识要特别强，才能将该英雄玩的很好。需要多熟悉、多玩，对应新手来说，不是特别适合。"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">"outputtwo"</span>:</span><br><span class="line">  &#123;<span class="attr">"img"</span>:<span class="string">"images/ngeG9PYKAYsdqHtZ.jpg"</span>,</span><br><span class="line">    <span class="attr">"text"</span>:<span class="string">"李白属于灵活走位，多段位移，七进七出，秀你一脸，比较吃操作的英雄，因此玩家的意识要特别强，才能将该英雄玩的很好。需要多熟悉、多玩，对应新手来说，不是特别适合。"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="源码解析"><a href="#源码解析" class="headerlink" title="源码解析"></a>源码解析</h2><ul>
+<li><p>查看js源码 其中有两个随机数 ansrandom，ansrandom2，ansrandom2 先来看 ansrandom2 ，ansrandom2 的取值只与 <code>.ad_after .ad_after_section</code>  有关，查看源码， 里面显示的是二维码等，所以与年龄判断无关,关键代码：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(ansrandom2%<span class="number">4</span>==<span class="number">0</span>)&#123;</span><br><span class="line">	$(<span class="string">'.ad_after .ad_after_section:eq(0)'</span>)</span><br><span class="line">	.css(<span class="string">'display'</span>,<span class="string">'flex'</span>)</span><br><span class="line">	.siblings()</span><br><span class="line">	.hide()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查看 ansrandom  ,其结果为选择<code>js/index_2.json</code>  选中节点中的随机一个年龄</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"> <span class="keyword">if</span>(ansrandom%<span class="number">2</span>==<span class="number">1</span>)&#123;</span><br><span class="line"> 	$(<span class="string">'.result'</span>).prepend(<span class="string">'&lt;img src="'</span>+result[index].output.img+<span class="string">'"class="result_img"/&gt;'</span>)</span><br><span class="line"> 	.find(<span class="string">'span'</span>).text(result[index].name.one);	</span><br><span class="line">	$(<span class="string">'title'</span>).text(<span class="string">'原来我左右脑年龄是'</span>+result[index].name.one+<span class="string">'，你也来看看'</span>);</span><br><span class="line"> &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">//设置 outputtwo 略</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<ul>
+<li>接下来判断他是如何选中 <code>js/index_2.json</code>  中的节点的<br>关键代码:<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// isNaN 来判断是否是最后一题</span></span><br><span class="line"><span class="keyword">if</span>(!<span class="built_in">isNaN</span>($(<span class="keyword">this</span>).data(<span class="string">"math"</span>)))&#123;</span><br><span class="line">	<span class="comment">//不是最后一题目 进入下一题</span></span><br><span class="line">    <span class="keyword">var</span> num_a=$(<span class="keyword">this</span>).data(<span class="string">"math"</span>)<span class="number">-1</span>	$(<span class="string">".question:eq("</span>+num_a+<span class="string">")"</span>).show().siblings().hide()</span><br><span class="line">    json[num_a].banner?$(<span class="string">".banner"</span>).prop(<span class="string">'src'</span>,json[num_a].banner):$(<span class="string">".banner"</span>).prop(<span class="string">'src'</span>, json[<span class="number">0</span>].banner)</span><br><span class="line">&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">	<span class="comment">//最后一题目显示结果</span></span><br><span class="line">	    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<ul>
+<li>通过<code>js/index.json</code>  中的<code>answer</code> 选择来跳转下一题，而 answer 的 中不同答案除了最后一个，都是相同而是 2，3,4,5,6,7,8,9 最后一个则分表为 abcd<br>所以前几题的结果都是无用的 年龄判断只与之后一题有关，<br>最后一题的<code>$(this).data(&quot;math&quot;);</code>中放的分别是 abcd ，通过匹配abcd 在<code>js/index_2.json</code> 中选择出word 相同的节点，再通过 ansrandom 再在节点中随机选个年龄来展示。</li>
+</ul>
+<h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h2><ol>
+<li>通过上一题的答案来选择下一题，但除最后一题外，跳转的题目都相同，故没有意义。</li>
+<li>最后结果只与最后一题有关，在从你选择的答案中，从预设对应答案中选择选择一个来展示。 </li>
+<li>答案对应年龄：</li>
+</ol>
+<ul>
+<li>a: 25与27岁   或  39与22岁</li>
+<li>b: 30与49岁   或  9岁与26岁</li>
+<li>c: 46岁与19岁 或  33岁与5岁</li>
+<li>d: 19与20岁</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/08/08/汽配兼容属性总表更新/" rel="next" title="汽配兼容属性总表更新">
+                <i class="fa fa-chevron-left"></i> 汽配兼容属性总表更新
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/12/15/solr介绍/" rel="prev" title="solr介绍">
+                solr介绍 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/uploads/images/avatar.jpg" alt="yanqibin">
+          <p class="site-author-name" itemprop="name">yanqibin</p>
+           
+              <p class="site-description motion-element" itemprop="description">yanqibin</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#左右脑源码解读"><span class="nav-number">1.</span> <span class="nav-text">左右脑源码解读</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据分析"><span class="nav-number">2.</span> <span class="nav-text">数据分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#源码解析"><span class="nav-number">3.</span> <span class="nav-text">源码解析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#结论"><span class="nav-number">4.</span> <span class="nav-text">结论</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">yanqibin</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
