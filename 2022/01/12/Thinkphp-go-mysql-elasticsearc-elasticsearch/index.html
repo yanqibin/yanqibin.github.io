@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="前言 项目使用 thinkphp  + mysql 对列表进行查询，列表数据量达到千万级别，且搜索维度效果，故采用elasticsearch进行搜索 为了尽量不改动代码逻辑，需要实现   数据自动同步至ES ( 使用  go-mysql-elasticsearch） 平滑切换TP自带的数据库查询操作到ES（自定义 query，转化TP 的查询条件为 ES的查询条件）  123456789graph">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Thinkphp + go-mysql-elasticsearc + elasticsearch">
+<meta property="og:url" content="https://yanqibin.github.io/2022/01/12/Thinkphp-go-mysql-elasticsearc-elasticsearch/index.html">
+<meta property="og:site_name" content="yanqibin 个人博客">
+<meta property="og:description" content="前言 项目使用 thinkphp  + mysql 对列表进行查询，列表数据量达到千万级别，且搜索维度效果，故采用elasticsearch进行搜索 为了尽量不改动代码逻辑，需要实现   数据自动同步至ES ( 使用  go-mysql-elasticsearch） 平滑切换TP自带的数据库查询操作到ES（自定义 query，转化TP 的查询条件为 ES的查询条件）  123456789graph">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://yanqibin.github.io/uploads/images/go-mysql-elasticsearch.jpg">
+<meta property="og:updated_time" content="2025-07-17T01:56:06.836Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Thinkphp + go-mysql-elasticsearc + elasticsearch">
+<meta name="twitter:description" content="前言 项目使用 thinkphp  + mysql 对列表进行查询，列表数据量达到千万级别，且搜索维度效果，故采用elasticsearch进行搜索 为了尽量不改动代码逻辑，需要实现   数据自动同步至ES ( 使用  go-mysql-elasticsearch） 平滑切换TP自带的数据库查询操作到ES（自定义 query，转化TP 的查询条件为 ES的查询条件）  123456789graph">
+<meta name="twitter:image" content="https://yanqibin.github.io/uploads/images/go-mysql-elasticsearch.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yanqibin.github.io/2022/01/12/Thinkphp-go-mysql-elasticsearc-elasticsearch/">
+
+
+
+
+
+  <title>Thinkphp + go-mysql-elasticsearc + elasticsearch | yanqibin 个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">yanqibin 个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">yanqibin</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yanqibin.github.io/2022/01/12/Thinkphp-go-mysql-elasticsearc-elasticsearch/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="yanqibin">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/uploads/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="yanqibin 个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Thinkphp + go-mysql-elasticsearc + elasticsearch</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-01-12T17:44:17+08:00">
+                2022-01-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><blockquote>
+<p>项目使用 thinkphp  + mysql 对列表进行查询，列表数据量达到千万级别，且搜索维度效果，故采用elasticsearch进行搜索</p>
+<p>为了尽量不改动代码逻辑，需要实现</p>
+</blockquote>
+<ul>
+<li>数据自动同步至ES ( 使用  go-mysql-elasticsearch）</li>
+<li>平滑切换TP自带的数据库查询操作到ES（自定义 query，转化TP 的查询条件为 ES的查询条件）</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">graph TD</span><br><span class="line">A --&gt; | go-mysql-elasticsearc 初始化时自动导出数据为SQL|G(sql)</span><br><span class="line">A[mysql] --&gt; |mysql开启log row格式|B(binlog)</span><br><span class="line"></span><br><span class="line">G --&gt; |解析SQL文件|D</span><br><span class="line">B --&gt; |伪装成从库  请求 数据| D[go-mysql-elasticsearch]</span><br><span class="line">D --&gt;|同步数据|F(elasticsearch)</span><br><span class="line"></span><br><span class="line">Z[ES 数据流程图]</span><br></pre></td></tr></table></figure>
+<p><img src="\uploads\images\go-mysql-elasticsearch.jpg" alt></p>
+<h1 id="功能使用"><a href="#功能使用" class="headerlink" title="功能使用"></a>功能使用</h1><h3 id="说明"><a href="#说明" class="headerlink" title="说明"></a>说明</h3><blockquote>
+<p> php 中\think\db\query\Elasticsearch  为 处理 TP语法到 ES 中的的查询语法，调用方式通DB 相同</p>
+<p>暂只支持where , whereor ,wherein  , limit ,  order  ,find select  ,value ,sum 方法</p>
+</blockquote>
+<ul>
+<li>查询方式</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Elasticsearch\Elasticsearch\FinanceBillIncome::where(&apos;xxx&apos;,&apos;xxx&apos;)-&gt;find();</span><br></pre></td></tr></table></figure>
+<ul>
+<li>列表时 先通过ES 查询出主键ID, 再通过主键 查询出明细数据</li>
+<li>列表查询通过 count 方法</li>
+<li>列表头部统计 ，通过如下方式查询</li>
+</ul>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">-&gt;sum(   [</span><br><span class="line">                     <span class="string">'expect_fee'</span>,</span><br><span class="line">                     <span class="string">'adjustment_fee'</span>,</span><br><span class="line">                     <span class="string">'confirm_fee'</span>,</span><br><span class="line">                 ]);</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>暂不支持 join，必须join 的降级为DB 处理</p>
+</li>
+<li><p>alias 方法指定后，ES 查询时将 自动去除查询条件与字段中头部别名</p>
+</li>
+</ul>
+<h3 id="使用步骤"><a href="#使用步骤" class="headerlink" title="使用步骤"></a>使用步骤</h3><blockquote>
+<p>先通过</p>
+</blockquote>
+<ul>
+<li><p>.env</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># 搜索引擎地址</span><br><span class="line">ELASTICSEARCH_HOST_NAME=&apos;192.168.x&apos;x.133&apos;</span><br><span class="line">ELASTICSEARCH_HOST_PORT=&apos;9200&apos;</span><br><span class="line">ELASTICSEARCH_INDEX_PREFIX=&apos;xxx_&apos;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>database.php</p>
+</li>
+</ul>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">'elasticsearch'</span>=&gt;[</span><br><span class="line">    <span class="string">'prefix'</span> =&gt;  env(<span class="string">'ELASTICSEARCH_INDEX_PREFIX'</span>),</span><br><span class="line">    <span class="string">'type'</span>     =&gt; <span class="string">'elasticsearch'</span>,</span><br><span class="line">    <span class="string">'hostname'</span> =&gt; env(<span class="string">'ELASTICSEARCH_HOST_NAME'</span>),</span><br><span class="line">    <span class="string">'hostport'</span> =&gt; env(<span class="string">'ELASTICSEARCH_HOST_PORT'</span>),</span><br><span class="line">    <span class="string">'debug'</span> =&gt; <span class="keyword">true</span>,</span><br><span class="line">    <span class="comment">// 是否严格检查字段是否存在</span></span><br><span class="line">    <span class="string">'fields_strict'</span> =&gt; <span class="keyword">false</span>,</span><br><span class="line">    <span class="comment">// 数据集返回类型 array 数组 collection Collection对象</span></span><br><span class="line">    <span class="string">'resultset_type'</span> =&gt; <span class="string">'array'</span>,</span><br><span class="line">    <span class="string">'sql_explain'</span> =&gt; <span class="keyword">false</span>,</span><br><span class="line">    <span class="string">'query'</span>           =&gt; <span class="string">'\\think\\db\\query\\Elasticsearch'</span>,</span><br><span class="line">],</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>builder <a href="\uploads\file\elasticsearch\think\db\builder\Elasticsearch.php">文件</a></p>
+</li>
+<li><p>connector<a href="\uploads\file\elasticsearch\think\db\connector\Elasticsearch.php">文件</a></p>
+</li>
+<li><p>query<a href="\uploads\file\elasticsearch\think\db\query\Elasticsearch.php">文件</a></p>
+</li>
+<li><p>新增 class  如</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Elasticsearch\Elasticsearch\FinanceBillIncome</span><br></pre></td></tr></table></figure>
+<ul>
+<li>初始化 ES，创建 index</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/cron/elasticsearch/initSearch</span><br></pre></td></tr></table></figure>
+<ul>
+<li>输出的内容 为 go-mysql-elasticsearch 中的配置</li>
+<li>启动  go-mysql-elasticsearch</li>
+</ul>
+<h1 id="监控"><a href="#监控" class="headerlink" title="监控"></a>监控</h1><ol>
+<li>定时 monitor 表中更新时间</li>
+<li>定时查询ES 中monitor  的时间</li>
+<li>对比时间差异，差异时间为延迟时间</li>
+</ol>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/02/22/php-resque延迟执行与失败重试/" rel="next" title="php-resque延迟执行与失败重试">
+                <i class="fa fa-chevron-left"></i> php-resque延迟执行与失败重试
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/uploads/images/avatar.jpg" alt="yanqibin">
+          <p class="site-author-name" itemprop="name">yanqibin</p>
+           
+              <p class="site-description motion-element" itemprop="description">yanqibin</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#功能使用"><span class="nav-number">2.</span> <span class="nav-text">功能使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#说明"><span class="nav-number">2.0.1.</span> <span class="nav-text">说明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用步骤"><span class="nav-number">2.0.2.</span> <span class="nav-text">使用步骤</span></a></li></ol></li></ol><li class="nav-item nav-level-1"><a class="nav-link" href="#监控"><span class="nav-number">3.</span> <span class="nav-text">监控</span></a></li></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">yanqibin</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
